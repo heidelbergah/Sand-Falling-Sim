@@ -28,6 +28,38 @@ void Engine::initObjects()
     em.initializeElementGrid(E_WIDTH, E_HEIGHT);
 }
 
+void Engine::setCurrentElement()
+{
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
+    {
+        currElement = sand;
+    }
+    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
+    {
+        currElement = water;
+    }
+    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
+    {
+        currElement = wood;
+    }
+    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num4))
+    {
+        currElement = fire;
+    }
+    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num5))
+    {
+        currElement = steam;
+    }
+    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num6))
+    {
+        currElement = steel;
+    }
+    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num7))
+    {
+        currElement = acid;
+    }
+}
+
 void Engine::processInput()
 {
     sf::Event event;
@@ -37,20 +69,24 @@ void Engine::processInput()
             window.close();
     }
 
+    setCurrentElement(); // Set the current element based on any recieved input
+
     // Mapping to pixel coords will help keep mouse position accurate to world view.
     sf::Vector2f currMousePos = window.mapPixelToCoords(mouse.getPosition(window));
 
     if(mouse.isButtonPressed(sf::Mouse::Left))
     {
-        em.setElement(int(currMousePos.x / elementWidth), int(currMousePos.y / elementHeight), sand);
-    }
-    else if(mouse.isButtonPressed(sf::Mouse::Right))
-    {
-        em.setElement(int(currMousePos.x / elementWidth), int(currMousePos.y / elementHeight), water);
-    }
-    else if(mouse.isButtonPressed(sf::Mouse::Middle))
-    {
-        em.setElement(int(currMousePos.x / elementWidth), int(currMousePos.y / elementHeight), wood);
+        int radius = 1;
+        int chanceToSpawn = 3; // 1/3 chance for element to actually spawn
+        int xIndex = int(currMousePos.x / elementWidth), yIndex = int(currMousePos.y / elementHeight);
+        for(int y = yIndex - radius; y < yIndex + radius; ++y)
+        {
+            for(int x = xIndex - radius; x < xIndex + radius; ++x)
+            {
+                if(rand() % chanceToSpawn == 0)
+                    em.setElement(x, y, currElement);
+            }
+        }
     }
 }
 
@@ -113,7 +149,22 @@ void Engine::render()
                     elementColor = sf::Color(133, 94, 66);
                     staticColorShade(elementColor, colorShade);
                     break;
-
+                case fire:
+                    elementColor = sf::Color(226, 88, 34);
+                    dynamicColorShade(elementColor);
+                    break;
+                case steam:
+                    elementColor = sf::Color(199, 213, 224);
+                    staticColorShade(elementColor, colorShade);
+                    break;
+                case steel:
+                    elementColor = sf::Color(122, 127, 128);
+                    staticColorShade(elementColor, colorShade);
+                    break;
+                case acid:
+                    elementColor = sf::Color(56, 100, 10);
+                    dynamicColorShade(elementColor);
+                    break;
             }
             element.setFillColor(elementColor);
             element.setPosition(elementWidth * currElement.getIndicies().x, elementHeight * currElement.getIndicies().y);

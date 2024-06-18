@@ -13,10 +13,16 @@ private:
     int WIDTH, HEIGHT, E_WIDTH, E_HEIGHT; // Suffix E is for how many elements go per WIDTH or height
     int FPS;
     int elementWidth, elementHeight;
+    ElementType currElement = sand;
 
     ElementManager em;
 
     sf::Mouse mouse;
+
+    /**
+     * Sets the current element type based on user input
+     */
+    void setCurrentElement();
 
     /**
      * Changes the shade of the element color depending on its associated colorShade.

@@ -112,6 +112,106 @@ void ElementManager::waterRules(sf::Vector2i indicies)
     }
 }
 
+void ElementManager::fireRules(sf::Vector2i indicies)
+{
+    int dissipateChance = 30;
+    int catchFireChance = 4;
+    int xd1, xd2; // X direction
+    int yd1, yd2; // Y direction
+    randomizeDirection(xd1, xd2);
+    randomizeDirection(yd1, yd2);
+    int x = indicies.x, y = indicies.y;
+    
+    // If element dissipates, turn it to a none element
+    if(rand() % dissipateChance == 0)
+    {
+        elements[y][x].changeElementType(none);
+        return;
+    }
+    
+    if(y != elements.size()-1 || y != 0)
+    {
+        // Check adjacent fire
+        if(elements[y+yd1][x].getElementType() == wood && rand() % catchFireChance == 0)
+            swap(indicies, sf::Vector2i(x, y+yd1), fire, fire);
+        else if(elements[y+yd2][x].getElementType() == wood && rand() % catchFireChance == 0)
+            swap(indicies, sf::Vector2i(x, y+yd2), fire, fire);
+        // Check adjacent water
+        else if(elements[y+yd1][x].getElementType() == water)
+            swap(indicies, sf::Vector2i(x, y+yd1), steam, steam);
+        else if(elements[y+yd2][x].getElementType() == water)
+            swap(indicies, sf::Vector2i(x, y+yd2), steam, steam);
+    }
+    if(x != elements[0].size()-1 || x != 0)
+    {
+        // Check adjacent fire
+        if(elements[y][x+xd1].getElementType() == wood && rand() % catchFireChance == 0)
+            swap(indicies, sf::Vector2i(x+xd1, y), fire, fire);
+        else if(elements[y][x+xd2].getElementType() == wood && rand() % catchFireChance == 0)
+            swap(indicies, sf::Vector2i(x+xd2, y), fire, fire);
+        // Check adjacent water
+        else if(elements[y][x+xd1].getElementType() == water)
+            swap(indicies, sf::Vector2i(x+xd1, y), steam, steam);
+        else if(elements[y][x+xd2].getElementType() == water)
+            swap(indicies, sf::Vector2i(x+xd2, y), steam, steam);
+    }
+}
+
+void ElementManager::steamRules(sf::Vector2i indicies)
+{
+    int dissipateChance = 40;
+    int direction1, direction2;
+    randomizeDirection(direction1, direction2);
+    int x = indicies.x, y = indicies.y;
+
+    // If element dissipates, turn it to a none element
+    if(rand() % dissipateChance == 0)
+    {
+        elements[y][x].changeElementType(none);
+        return;
+    }
+
+    if(y != 0) // Bounds checking
+    {
+        // If element below is empty, move to it
+        if(elements[y-1][x].getElementType() == none)
+            swap(indicies, sf::Vector2i(x, y-1));
+        else if(x != elements[0].size()-1 || x != 0) // Bounds checking
+        {
+            // If either left or right and below is empty, move to it
+            if(elements[y-1][x+direction1].getElementType() == none)
+                swap(indicies, sf::Vector2i(x+direction1, y-1));
+            else if(elements[y-1][x+direction2].getElementType() == none)
+                swap(indicies, sf::Vector2i(x+direction2, y-1));
+        }
+    }
+}
+
+void ElementManager::acidRules(sf::Vector2i indicies)
+{
+    int direction1, direction2;
+    randomizeDirection(direction1, direction2);
+    int x = indicies.x, y = indicies.y;
+    if(y != elements.size()-1) // Bounds checking
+    {
+        // If element below is empty, move to it.
+        if(elements[y+1][x].getElementType() == none)
+            swap(indicies, sf::Vector2i(x, y+1));
+        else if(x != elements[0].size()-1 || x != 0) // Bounds checking
+        {
+            // Same as sand, but check directly to left and right as well
+            if(elements[y+1][x+direction1].getElementType() == none)
+                swap(indicies, sf::Vector2i(x+direction1, y+1));
+            else if(elements[y+1][x+direction2].getElementType() == none)
+                swap(indicies, sf::Vector2i(x+direction2, y+1));
+            else if(elements[y][x+direction1].getElementType() == none)
+                swap(indicies, sf::Vector2i(x+direction1, y));
+            else if(elements[y][x+direction2].getElementType() == none)
+                swap(indicies, sf::Vector2i(x+direction2, y));
+        }
+    }
+}
+
 void ElementManager::updateElements()
 {
     resetDirtyElements();
@@ -127,6 +227,7 @@ void ElementManager::updateElements()
             switch(currElement.getElementType())
             {
                 case none:
+                case steel:
                 case wood:
                     // Do nothing, just stay stationary
                     break;
@@ -135,6 +236,15 @@ void ElementManager::updateElements()
                     break;
                 case water:
                     waterRules(currElement.getIndicies());
+                    break;
+                case fire:
+                    fireRules(currElement.getIndicies());
+                    break;
+                case steam:
+                    steamRules(currElement.getIndicies());
+                    break;
+                case acid:
+                    acidRules(currElement.getIndicies());
                     break;
             }
         }

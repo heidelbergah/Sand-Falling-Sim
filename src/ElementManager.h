@@ -40,6 +40,9 @@ private:
      */
     void sandRules(sf::Vector2i indicies);
     void waterRules(sf::Vector2i indicies);
+    void fireRules(sf::Vector2i indicies);
+    void steamRules(sf::Vector2i indicies);
+    void acidRules(sf::Vector2i indicies);
 
 public:
     /**
