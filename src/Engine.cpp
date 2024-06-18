@@ -59,6 +59,30 @@ void Engine::update()
     em.updateElements();
 }
 
+void Engine::staticColorShade(sf::Color& color, int colorShade) const
+{
+    if(colorShade == 0)
+    {
+        int darkeningFactor = 10;
+        color.r -= darkeningFactor;
+        color.g -= darkeningFactor;
+        color.b -= darkeningFactor;
+    }
+    else if(colorShade == 2)
+    {
+        int lighteningFactor = 10;
+        color.r += lighteningFactor;
+        color.g += lighteningFactor;
+        color.b += lighteningFactor;
+    }
+}
+    
+void Engine::dynamicColorShade(sf::Color& color) const
+{
+    int colorShade = rand() % 3;
+    staticColorShade(color, colorShade);
+}
+
 void Engine::render()
 {
     std::vector<std::vector<Element>> elements = em.getElements();
@@ -70,22 +94,28 @@ void Engine::render()
         {
             Element currElement = elements[y][x];
             sf::RectangleShape element(sf::Vector2f(elementWidth, elementHeight));
+            int colorShade = elements[y][x].getColorShade();
+            sf::Color elementColor;
             switch(currElement.getElementType())
             {
                 case none:
-                    element.setFillColor(sf::Color::Black);
+                    elementColor = sf::Color::Black;
                     break;
                 case sand:
-                    element.setFillColor(sf::Color::Yellow);
+                    elementColor = sf::Color(236, 204, 162);
+                    staticColorShade(elementColor, colorShade);
                     break;
                 case water:
-                    element.setFillColor(sf::Color::Blue);
+                    elementColor = sf::Color(35, 187, 213);
+                    staticColorShade(elementColor, colorShade);
                     break;
                 case wood:
-                    element.setFillColor(sf::Color::Green);
+                    elementColor = sf::Color(133, 94, 66);
+                    staticColorShade(elementColor, colorShade);
                     break;
 
             }
+            element.setFillColor(elementColor);
             element.setPosition(elementWidth * currElement.getIndicies().x, elementHeight * currElement.getIndicies().y);
             window.draw(element);
         }

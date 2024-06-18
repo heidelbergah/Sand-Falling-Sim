@@ -22,6 +22,14 @@ void ElementManager::swap(sf::Vector2i indicies1, sf::Vector2i indicies2)
     elements[indicies2.y][indicies2.x].changeElementType(temp);
 }
 
+void ElementManager::swap(sf::Vector2i indicies1, sf::Vector2i indicies2, ElementType e1, ElementType e2)
+{
+    dirtyElements[indicies1.y][indicies1.x] = true;
+    dirtyElements[indicies2.y][indicies2.x] = true;
+    elements[indicies1.y][indicies1.x].changeElementType(e1);
+    elements[indicies2.y][indicies2.x].changeElementType(e2);
+}
+
 void ElementManager::randomizeDirection(int& direction1, int& direction2)
 {
     direction1 = -1;
@@ -50,7 +58,7 @@ void ElementManager::initializeElementGrid(int e_width, int e_height)
         std::vector<bool> rowDirty;
         for(int x = 0; x < e_width; ++x)
         {
-            rowElements.push_back(Element(none, x, y));
+            rowElements.push_back(Element(none, x, y, rand() % 3));
             rowDirty.push_back(false);
         }
         elements.push_back(rowElements);

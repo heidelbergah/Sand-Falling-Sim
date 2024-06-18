@@ -15,25 +15,51 @@ enum ElementType
     none,
     sand,
     water,
-    wood
+    wood,
+    fire,
+    steam,
+    steel,
+    acid
 };
 
 class Element
 {
 private:
     ElementType eType;
-    int xIndex, yIndex;
+    int xIndex, yIndex, colorShade;
 
 public:
+    /**
+     * Base constructor. Simply sets a base value for each member variable
+     */
     Element();
 
-    Element(ElementType eType, int xIndex, int yIndex);
+    /**
+     * Sets a specified value for each member variable
+     */
+    Element(ElementType eType, int xIndex, int yIndex, int colorShade);
 
+    /**
+     * Changes the current element type to a specified element type
+     */
     void changeElementType(ElementType eType);
 
+    /**
+     * Returns the element type
+     */
     ElementType getElementType() const;
 
+    /**
+     * Returns the indicies of the element
+     */
     sf::Vector2i getIndicies() const;
+
+    /**
+     * Returns the color shade for the element to be drawn. The color shade ranges
+     * from 0-2, 0 being the lighest shade, 2 being the darkest. This helps give elements
+     * a more natural looking appearance
+     */
+    int getColorShade() const;
 };
 
 #endif
