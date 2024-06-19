@@ -11,6 +11,7 @@ class Engine
 private:
     sf::RenderWindow window;
     int WIDTH, HEIGHT, E_WIDTH, E_HEIGHT; // Suffix E is for how many elements go per WIDTH or height
+    int SELECTION_TAB_WIDTH;
     int FPS;
     int elementWidth, elementHeight;
     ElementType currElement = sand;
@@ -44,7 +45,7 @@ public:
     /**
      * Sets members variables to specified values
      */
-    Engine(int w, int h, int e_w, int e_h, int fps);
+    Engine(int w, int h, int e_w, int e_h, int stw, int fps);
 
     /**
      * Initializes all member objects. Meant to be run one time at the start

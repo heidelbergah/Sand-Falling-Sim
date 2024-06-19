@@ -189,6 +189,7 @@ void ElementManager::steamRules(sf::Vector2i indicies)
 
 void ElementManager::acidRules(sf::Vector2i indicies)
 {
+    int corrodeChance = 7;
     int direction1, direction2;
     randomizeDirection(direction1, direction2);
     int x = indicies.x, y = indicies.y;
@@ -197,6 +198,10 @@ void ElementManager::acidRules(sf::Vector2i indicies)
         // If element below is empty, move to it.
         if(elements[y+1][x].getElementType() == none)
             swap(indicies, sf::Vector2i(x, y+1));
+        else if(elements[y+1][x].getElementType() != steel && rand() % corrodeChance == 0)
+            swap(indicies, sf::Vector2i(x, y+1), acid, none);
+        else if(elements[y+1][x].getElementType() == steel && rand() % corrodeChance * 4 == 0)
+            swap(indicies, sf::Vector2i(x, y+1), acid, none);
         else if(x != elements[0].size()-1 || x != 0) // Bounds checking
         {
             // Same as sand, but check directly to left and right as well
@@ -208,6 +213,22 @@ void ElementManager::acidRules(sf::Vector2i indicies)
                 swap(indicies, sf::Vector2i(x+direction1, y));
             else if(elements[y][x+direction2].getElementType() == none)
                 swap(indicies, sf::Vector2i(x+direction2, y));
+            else if(elements[y+1][x+direction1].getElementType() != steel && rand() % corrodeChance == 0)
+                swap(indicies, sf::Vector2i(x+direction1, y+1), acid, none);
+            else if(elements[y+1][x+direction2].getElementType() != steel && rand() % corrodeChance == 0)
+                swap(indicies, sf::Vector2i(x+direction2, y+1), acid, none);
+            else if(elements[y][x+direction1].getElementType() != steel && rand() % corrodeChance == 0)
+                swap(indicies, sf::Vector2i(x+direction1, y), acid, none);
+            else if(elements[y][x+direction2].getElementType() != steel && rand() % corrodeChance == 0)
+                swap(indicies, sf::Vector2i(x+direction2, y), acid, none);
+            else if(elements[y+1][x+direction1].getElementType() == steel && rand() % corrodeChance * 4 == 0)
+                swap(indicies, sf::Vector2i(x+direction1, y+1), acid, none);
+            else if(elements[y+1][x+direction2].getElementType() == steel && rand() % corrodeChance * 4 == 0)
+                swap(indicies, sf::Vector2i(x+direction2, y+1), acid, none);
+            else if(elements[y][x+direction1].getElementType() == steel && rand() % corrodeChance * 4 == 0)
+                swap(indicies, sf::Vector2i(x+direction1, y), acid, none);
+            else if(elements[y][x+direction2].getElementType() == steel && rand() % corrodeChance * 4 == 0)
+                swap(indicies, sf::Vector2i(x+direction2, y), acid, none);
         }
     }
 }

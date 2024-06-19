@@ -2,26 +2,27 @@
 
 Engine::Engine()
 {
-    WIDTH = 750;
+    WIDTH = 900;
     HEIGHT = 750;
     E_WIDTH = 75;
     E_HEIGHT = 75;
-
+    SELECTION_TAB_WIDTH = 150;
     FPS = 60;
 }
 
-Engine::Engine(int w, int h, int e_w, int e_h, int fps)
+Engine::Engine(int w, int h, int e_w, int e_h, int stw, int fps)
 {
     WIDTH = w;
     HEIGHT = h;
     E_WIDTH = e_w;
     E_HEIGHT = e_h;
+    SELECTION_TAB_WIDTH = stw;
     FPS = fps;
 }
 
 void Engine::initObjects()
 {
-    elementWidth = WIDTH / E_WIDTH;
+    elementWidth = (WIDTH - SELECTION_TAB_WIDTH) / E_WIDTH;
     elementHeight = HEIGHT / E_HEIGHT;
     window.create(sf::VideoMode(WIDTH, HEIGHT), "Sand Falling Simulator");
     window.setFramerateLimit(FPS);
@@ -74,19 +75,31 @@ void Engine::processInput()
     // Mapping to pixel coords will help keep mouse position accurate to world view.
     sf::Vector2f currMousePos = window.mapPixelToCoords(mouse.getPosition(window));
 
+    // Spawn in currently selected element
     if(mouse.isButtonPressed(sf::Mouse::Left))
     {
         int radius = 1;
         int chanceToSpawn = 3; // 1/3 chance for element to actually spawn
+        // Keeping the element selection tab to the right of the world view allows us to keep the same
+        // formula for calculating the x and y index. If the tab were to the left, we would have to subtract
+        // the current mouse position with the selection tab width.
         int xIndex = int(currMousePos.x / elementWidth), yIndex = int(currMousePos.y / elementHeight);
         for(int y = yIndex - radius; y < yIndex + radius; ++y)
         {
             for(int x = xIndex - radius; x < xIndex + radius; ++x)
             {
+                // Stop from attempting to spawn elements out of range
+                if(x < 0 || x >= E_WIDTH || y < 0 || y >= E_HEIGHT)
+                    break;
                 if(rand() % chanceToSpawn == 0)
                     em.setElement(x, y, currElement);
             }
         }
+    }
+
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+    {
+        
     }
 }
 
@@ -171,7 +184,12 @@ void Engine::render()
             window.draw(element);
         }
     }
-
+    sf::RectangleShape selectionTab;
+    selectionTab.setSize(sf::Vector2f(SELECTION_TAB_WIDTH, HEIGHT));
+    selectionTab.setOrigin(SELECTION_TAB_WIDTH, 0);
+    selectionTab.setPosition(WIDTH, 0);
+    selectionTab.setFillColor(sf::Color::Cyan);
+    window.draw(selectionTab);
     window.display();
 }
 
