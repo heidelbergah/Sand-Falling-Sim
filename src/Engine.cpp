@@ -27,37 +27,62 @@ void Engine::initObjects()
     window.create(sf::VideoMode(WIDTH, HEIGHT), "Sand Falling Simulator");
     window.setFramerateLimit(FPS);
     em.initializeElementGrid(E_WIDTH, E_HEIGHT);
+
+    // Set up the selection tab elements
+    selectionTab.setSize(sf::Vector2f(SELECTION_TAB_WIDTH, HEIGHT));
+    selectionTab.setOrigin(SELECTION_TAB_WIDTH, 0);
+    selectionTab.setPosition(WIDTH, 0);
+    selectionTab.setFillColor(sf::Color(25, 25, 25));
+    
+    selectedOutlineColor.r = 187;
+    selectedOutlineColor.g = 165;
+    selectedOutlineColor.b = 61;
+    baseOutlineColor.r = 80;
+    baseOutlineColor.g = 80;
+    baseOutlineColor.b = 80;
+
+    int middleDivider = SELECTION_TAB_WIDTH / 2;
+    int padding = 10;
+    int elementSelectorSize = middleDivider - (padding*2);
+    int adjustedWidth = WIDTH - SELECTION_TAB_WIDTH;
+    int yLevel = 0;
+    // Update acid to the last element in the ElementType enum
+    for(int i = 0; i < 8; ++i)
+    {
+        sf::RectangleShape elementSelector;
+        elementSelector.setFillColor(getElementColor(ElementType(i)));
+        elementSelector.setOutlineThickness(2);
+        elementSelector.setOutlineColor(baseOutlineColor); // Gold color
+        elementSelector.setSize(sf::Vector2f(elementSelectorSize, elementSelectorSize));
+        if(i % 2 == 0)
+        {
+            elementSelector.setPosition(adjustedWidth + padding, padding + (padding + elementSelectorSize) * yLevel);
+        }
+        else
+        {
+            elementSelector.setPosition(adjustedWidth + padding + middleDivider, padding + (padding + elementSelectorSize) * yLevel);
+            yLevel++;
+        }
+        elementSelectors.push_back(elementSelector);
+    }
 }
 
-void Engine::setCurrentElement()
+void Engine::setCurrentElement(sf::Vector2f mousePos)
 {
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
+    for(int i = 0; i < elementSelectors.size(); ++i)
     {
-        currElement = sand;
-    }
-    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
-    {
-        currElement = water;
-    }
-    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
-    {
-        currElement = wood;
-    }
-    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num4))
-    {
-        currElement = fire;
-    }
-    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num5))
-    {
-        currElement = steam;
-    }
-    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num6))
-    {
-        currElement = steel;
-    }
-    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num7))
-    {
-        currElement = acid;
+        if(mouse.isButtonPressed(sf::Mouse::Left))
+        {
+            if(elementSelectors[i].getGlobalBounds().contains(mousePos))
+            {
+                elementSelectors[currElement].setOutlineColor(baseOutlineColor);
+                elementSelectors[currElement].setOutlineThickness(2);
+                elementSelectors[i].setOutlineColor(selectedOutlineColor); // Gold color
+                elementSelectors[i].setOutlineThickness(4);
+                currElement = ElementType(i);
+                return;
+            }
+        }
     }
 }
 
@@ -70,10 +95,10 @@ void Engine::processInput()
             window.close();
     }
 
-    setCurrentElement(); // Set the current element based on any recieved input
-
     // Mapping to pixel coords will help keep mouse position accurate to world view.
     sf::Vector2f currMousePos = window.mapPixelToCoords(mouse.getPosition(window));
+    
+    setCurrentElement(currMousePos); // Set the current element based on any recieved input
 
     // Spawn in currently selected element
     if(mouse.isButtonPressed(sf::Mouse::Left))
@@ -131,6 +156,38 @@ void Engine::dynamicColorShade(sf::Color& color) const
     int colorShade = rand() % 3;
     staticColorShade(color, colorShade);
 }
+    
+sf::Color Engine::getElementColor(ElementType et)
+{
+    switch(et)
+    {
+        case none:
+            return sf::Color(0, 0, 0);
+            break;
+        case sand:
+            return sf::Color(236, 204, 162);
+            break;
+        case water:
+            return sf::Color(35, 187, 213);
+            break;
+        case wood:
+            return sf::Color(133, 94, 66);
+            break;
+        case fire:
+            return sf::Color(226, 88, 34);
+            break;
+        case steam:
+            return sf::Color(199, 213, 224);
+            break;
+        case steel:
+            return sf::Color(122, 127, 128);
+            break;
+        case acid:
+            return sf::Color(56, 100, 10);
+            break;
+    }
+    return sf::Color(0, 0, 0);
+}
 
 void Engine::render()
 {
@@ -148,34 +205,34 @@ void Engine::render()
             switch(currElement.getElementType())
             {
                 case none:
-                    elementColor = sf::Color::Black;
+                    elementColor = getElementColor(none);
                     break;
                 case sand:
-                    elementColor = sf::Color(236, 204, 162);
+                    elementColor = getElementColor(sand);
                     staticColorShade(elementColor, colorShade);
                     break;
                 case water:
-                    elementColor = sf::Color(35, 187, 213);
+                    elementColor = getElementColor(water);
                     staticColorShade(elementColor, colorShade);
                     break;
                 case wood:
-                    elementColor = sf::Color(133, 94, 66);
+                    elementColor = getElementColor(wood);
                     staticColorShade(elementColor, colorShade);
                     break;
                 case fire:
-                    elementColor = sf::Color(226, 88, 34);
+                    elementColor = getElementColor(fire);
                     dynamicColorShade(elementColor);
                     break;
                 case steam:
-                    elementColor = sf::Color(199, 213, 224);
+                    elementColor = getElementColor(steam);
                     staticColorShade(elementColor, colorShade);
                     break;
                 case steel:
-                    elementColor = sf::Color(122, 127, 128);
+                    elementColor = getElementColor(steel);
                     staticColorShade(elementColor, colorShade);
                     break;
                 case acid:
-                    elementColor = sf::Color(56, 100, 10);
+                    elementColor = getElementColor(acid);
                     dynamicColorShade(elementColor);
                     break;
             }
@@ -184,12 +241,15 @@ void Engine::render()
             window.draw(element);
         }
     }
-    sf::RectangleShape selectionTab;
-    selectionTab.setSize(sf::Vector2f(SELECTION_TAB_WIDTH, HEIGHT));
-    selectionTab.setOrigin(SELECTION_TAB_WIDTH, 0);
-    selectionTab.setPosition(WIDTH, 0);
-    selectionTab.setFillColor(sf::Color::Cyan);
+    
+    // Selection tab rendering
     window.draw(selectionTab);
+    for(sf::RectangleShape shape : elementSelectors)
+    {
+        window.draw(shape);
+    }
+    
+    // Display everything
     window.display();
 }
 

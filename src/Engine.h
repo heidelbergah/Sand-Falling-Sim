@@ -14,16 +14,18 @@ private:
     int SELECTION_TAB_WIDTH;
     int FPS;
     int elementWidth, elementHeight;
-    ElementType currElement = sand;
-
+    ElementType currElement = none;
     ElementManager em;
-
     sf::Mouse mouse;
+    std::vector<sf::RectangleShape> elementSelectors;
+    sf::RectangleShape selectionTab;
+
+    sf::Color selectedOutlineColor, baseOutlineColor;
 
     /**
      * Sets the current element type based on user input
      */
-    void setCurrentElement();
+    void setCurrentElement(sf::Vector2f mousePos);
 
     /**
      * Changes the shade of the element color depending on its associated colorShade.
@@ -36,6 +38,12 @@ private:
      * Used for elements like fire, acid, etc.
      */
     void dynamicColorShade(sf::Color& color) const;
+
+    /**
+     * Given the elementType or elementType index, will return
+     * the base color associated with that element;
+     */
+    sf::Color getElementColor(ElementType et);
 public:
     /**
      * Base constructor. Sets base values for member variables
