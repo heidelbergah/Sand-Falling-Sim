@@ -87,7 +87,7 @@ void ElementManager::sandRules(sf::Vector2i indicies)
         // If element below is empty, move to it
         if(elements[y+1][x].getElementType() == none)
             swap(indicies, sf::Vector2i(x, y+1));
-        else if(x != elements[0].size()-1 || x != 0) // Bounds checking
+        else if(x <= elements[0].size()-1 && x >= 0) // Bounds checking
         {
             // If either left or right and below is empty, move to it
             if(elements[y+1][x+direction1].getElementType() == none)
@@ -108,7 +108,7 @@ void ElementManager::waterRules(sf::Vector2i indicies)
         // If element below is empty, move to it.
         if(elements[y+1][x].getElementType() == none)
             swap(indicies, sf::Vector2i(x, y+1));
-        else if(x != elements[0].size()-1 || x != 0) // Bounds checking
+        else if(x <= elements[0].size()-1 && x >= 0) // Bounds checking
         {
             // Same as sand, but check directly to left and right as well
             if(elements[y+1][x+direction1].getElementType() == none)
@@ -140,7 +140,7 @@ void ElementManager::fireRules(sf::Vector2i indicies)
         return;
     }
     
-    if(y != elements.size()-1 || y != 0)
+    if(y != elements.size()-1 && y != 0)
     {
         // Check adjacent fire
         if(elements[y+yd1][x].getElementType() == wood && rand() % catchFireChance == 0)
@@ -157,7 +157,7 @@ void ElementManager::fireRules(sf::Vector2i indicies)
         else if(elements[y+yd2][x].getElementType() == gunpowder)
             swap(indicies, sf::Vector2i(x, y+yd2), fire, fire);
     }
-    if(x != elements[0].size()-1 || x != 0)
+    if(x <= elements[0].size()-1 && x >= 0)
     {
         // Check adjacent fire
         if(elements[y][x+xd1].getElementType() == wood && rand() % catchFireChance == 0)
@@ -195,7 +195,7 @@ void ElementManager::steamRules(sf::Vector2i indicies)
         // If element below is empty, move to it
         if(elements[y-1][x].getElementType() == none)
             swap(indicies, sf::Vector2i(x, y-1));
-        else if(x != elements[0].size()-1 || x != 0) // Bounds checking
+        else if(x <= elements[0].size()-1 && x >= 0) // Bounds checking
         {
             // If either left or right and below is empty, move to it
             if(elements[y-1][x+direction1].getElementType() == none)
@@ -221,7 +221,7 @@ void ElementManager::acidRules(sf::Vector2i indicies)
             swap(indicies, sf::Vector2i(x, y+1), acid, none);
         else if(elements[y+1][x].getElementType() == steel && rand() % (corrodeChance * 4) == 0)
             swap(indicies, sf::Vector2i(x, y+1), acid, none);
-        else if(x != elements[0].size()-1 || x != 0) // Bounds checking
+        else if(x <= elements[0].size()-1 && x >= 0) // Bounds checking
         {
             // Same as sand, but check directly to left and right as well
             if(elements[y+1][x+direction1].getElementType() == none)
@@ -260,14 +260,14 @@ void ElementManager::slimeRules(sf::Vector2i indicies)
     randomizeDirection(yd1, yd2);
     int x = indicies.x, y = indicies.y;
     
-    if(y != elements.size()-1 || y != 0)
+    if(y != elements.size()-1 && y != 0)
     {
         if(elements[y+yd1][x].getElementType() != none)
             swap(indicies, sf::Vector2i(x, y+yd1), slime, slime);
         else if(elements[y+yd2][x].getElementType() != none)
             swap(indicies, sf::Vector2i(x, y+yd2), slime, slime);
     }
-    if(x != elements[0].size()-1 || x != 0)
+    if(x <= elements[0].size()-1 && x >= 0)
     {
         if(elements[y][x+xd1].getElementType() != none)
             swap(indicies, sf::Vector2i(x+xd1, y), slime, slime);
