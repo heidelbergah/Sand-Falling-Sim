@@ -50,6 +50,17 @@ void ElementManager::resetDirtyElements()
     }
 }
 
+void ElementManager::resetElements()
+{
+    for(int y = 0; y < elements.size(); ++y)
+    {
+        for(int x = 0; x < elements[0].size(); ++x)
+        {
+            elements[y][x].changeElementType(none);
+        }
+    }
+}
+
 void ElementManager::initializeElementGrid(int e_width, int e_height)
 {
     for(int y = 0; y < e_height; ++y)
@@ -141,6 +152,10 @@ void ElementManager::fireRules(sf::Vector2i indicies)
             swap(indicies, sf::Vector2i(x, y+yd1), steam, steam);
         else if(elements[y+yd2][x].getElementType() == water)
             swap(indicies, sf::Vector2i(x, y+yd2), steam, steam);
+        else if(elements[y+yd1][x].getElementType() == gunpowder)
+            swap(indicies, sf::Vector2i(x, y+yd1), fire, fire);
+        else if(elements[y+yd2][x].getElementType() == gunpowder)
+            swap(indicies, sf::Vector2i(x, y+yd2), fire, fire);
     }
     if(x != elements[0].size()-1 || x != 0)
     {
@@ -154,6 +169,10 @@ void ElementManager::fireRules(sf::Vector2i indicies)
             swap(indicies, sf::Vector2i(x+xd1, y), steam, steam);
         else if(elements[y][x+xd2].getElementType() == water)
             swap(indicies, sf::Vector2i(x+xd2, y), steam, steam);
+        else if(elements[y][x+xd1].getElementType() == gunpowder)
+            swap(indicies, sf::Vector2i(x+xd1, y), fire, fire);
+        else if(elements[y][x+xd2].getElementType() == gunpowder)
+            swap(indicies, sf::Vector2i(x+xd2, y), fire, fire);
     }
 }
 
@@ -233,6 +252,30 @@ void ElementManager::acidRules(sf::Vector2i indicies)
     }
 }
 
+void ElementManager::slimeRules(sf::Vector2i indicies)
+{
+    int xd1, xd2; // X direction
+    int yd1, yd2; // Y direction
+    randomizeDirection(xd1, xd2);
+    randomizeDirection(yd1, yd2);
+    int x = indicies.x, y = indicies.y;
+    
+    if(y != elements.size()-1 || y != 0)
+    {
+        if(elements[y+yd1][x].getElementType() != none)
+            swap(indicies, sf::Vector2i(x, y+yd1), slime, slime);
+        else if(elements[y+yd2][x].getElementType() != none)
+            swap(indicies, sf::Vector2i(x, y+yd2), slime, slime);
+    }
+    if(x != elements[0].size()-1 || x != 0)
+    {
+        if(elements[y][x+xd1].getElementType() != none)
+            swap(indicies, sf::Vector2i(x+xd1, y), slime, slime);
+        else if(elements[y][x+xd2].getElementType() != none)
+            swap(indicies, sf::Vector2i(x+xd2, y), slime, slime);
+    }
+}
+
 void ElementManager::updateElements()
 {
     resetDirtyElements();
@@ -253,6 +296,7 @@ void ElementManager::updateElements()
                     // Do nothing, just stay stationary
                     break;
                 case sand:
+                case gunpowder:
                     sandRules(currElement.getIndicies());
                     break;
                 case water:
@@ -267,10 +311,12 @@ void ElementManager::updateElements()
                 case acid:
                     acidRules(currElement.getIndicies());
                     break;
+                case slime:
+                    slimeRules(currElement.getIndicies());
+                    break;
             }
         }
     }
-
 }
 
 void ElementManager::setElement(int xIndex, int yIndex, ElementType type)

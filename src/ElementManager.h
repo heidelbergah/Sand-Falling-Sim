@@ -32,6 +32,7 @@ private:
      */
     void resetDirtyElements();
 
+
     /**
      * The following [element]Rules functions are the set of rules
      * each element will follow when the updateElements function is run.
@@ -43,6 +44,7 @@ private:
     void fireRules(sf::Vector2i indicies);
     void steamRules(sf::Vector2i indicies);
     void acidRules(sf::Vector2i indicies);
+    void slimeRules(sf::Vector2i indicies);
 
 public:
     /**
@@ -68,6 +70,11 @@ public:
      */
     void setElement(int xIndex, int yIndex, ElementType type);
 
+    /**
+     * Sets every element in elements to ElementType "none"
+     */
+    void resetElements();
+    
     /**
      * Returns a reference to the elements vector
      */

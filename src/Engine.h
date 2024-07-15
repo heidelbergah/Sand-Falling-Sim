@@ -10,7 +10,7 @@ class Engine
 {
 private:
     sf::RenderWindow window;
-    int WIDTH, HEIGHT, E_WIDTH, E_HEIGHT; // Suffix E is for how many elements go per WIDTH or height
+    int WIDTH, HEIGHT, E_WIDTH, E_HEIGHT; // Prefix E is for how many elements go per WIDTH or height
     int SELECTION_TAB_WIDTH;
     int FPS;
     int elementWidth, elementHeight;
@@ -21,6 +21,11 @@ private:
     sf::RectangleShape selectionTab;
 
     sf::Color selectedOutlineColor, baseOutlineColor;
+
+    /**
+     * Spawns elements within a certain radius and chance to spawn
+     */
+    void spawnElements(int radius, int chanceToSpawn, sf::Vector2f mousePos);
 
     /**
      * Sets the current element type based on user input
@@ -44,6 +49,13 @@ private:
      * the base color associated with that element;
      */
     sf::Color getElementColor(ElementType et);
+
+    /**
+     * Sets every element in elementManager to type "none",
+     * essentially clearing the screen
+     */
+    void clearScreen();
+
 public:
     /**
      * Base constructor. Sets base values for member variables

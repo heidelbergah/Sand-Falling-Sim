@@ -19,7 +19,9 @@ enum ElementType
     fire,
     steam,
     steel,
-    acid
+    acid,
+    gunpowder,
+    slime
 };
 
 class Element

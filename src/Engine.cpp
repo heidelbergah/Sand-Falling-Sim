@@ -47,7 +47,7 @@ void Engine::initObjects()
     int adjustedWidth = WIDTH - SELECTION_TAB_WIDTH;
     int yLevel = 0;
     // Update acid to the last element in the ElementType enum
-    for(int i = 0; i < 8; ++i)
+    for(int i = 0; i < 10; ++i)
     {
         sf::RectangleShape elementSelector;
         elementSelector.setFillColor(getElementColor(ElementType(i)));
@@ -64,6 +64,25 @@ void Engine::initObjects()
             yLevel++;
         }
         elementSelectors.push_back(elementSelector);
+    }
+}
+
+void Engine::spawnElements(int radius, int chanceToSpawn, sf::Vector2f currMousePos)
+{
+    // Keeping the element selection tab to the right of the world view allows us to keep the same
+    // formula for calculating the x and y index. If the tab were to the left, we would have to subtract
+    // the current mouse position with the selection tab width.
+    int xIndex = int(currMousePos.x / elementWidth), yIndex = int(currMousePos.y / elementHeight);
+    for(int y = yIndex - radius; y < yIndex + radius; ++y)
+    {
+        for(int x = xIndex - radius; x < xIndex + radius; ++x)
+        {
+            // Stop from attempting to spawn elements out of range
+            if(x < 0 || x >= E_WIDTH || y < 0 || y >= E_HEIGHT)
+                break;
+            if(rand() % chanceToSpawn == 0)
+                em.setElement(x, y, currElement);
+        }
     }
 }
 
@@ -86,6 +105,11 @@ void Engine::setCurrentElement(sf::Vector2f mousePos)
     }
 }
 
+void Engine::clearScreen()
+{
+    em.resetElements();
+}
+
 void Engine::processInput()
 {
     sf::Event event;
@@ -103,28 +127,12 @@ void Engine::processInput()
     // Spawn in currently selected element
     if(mouse.isButtonPressed(sf::Mouse::Left))
     {
-        int radius = 1;
-        int chanceToSpawn = 3; // 1/3 chance for element to actually spawn
-        // Keeping the element selection tab to the right of the world view allows us to keep the same
-        // formula for calculating the x and y index. If the tab were to the left, we would have to subtract
-        // the current mouse position with the selection tab width.
-        int xIndex = int(currMousePos.x / elementWidth), yIndex = int(currMousePos.y / elementHeight);
-        for(int y = yIndex - radius; y < yIndex + radius; ++y)
-        {
-            for(int x = xIndex - radius; x < xIndex + radius; ++x)
-            {
-                // Stop from attempting to spawn elements out of range
-                if(x < 0 || x >= E_WIDTH || y < 0 || y >= E_HEIGHT)
-                    break;
-                if(rand() % chanceToSpawn == 0)
-                    em.setElement(x, y, currElement);
-            }
-        }
+        spawnElements(1, 1, currMousePos);
     }
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
     {
-        
+        clearScreen();
     }
 }
 
@@ -185,6 +193,12 @@ sf::Color Engine::getElementColor(ElementType et)
         case acid:
             return sf::Color(56, 100, 10);
             break;
+        case gunpowder:
+            return sf::Color(70, 70, 80);
+            break;
+        case slime:
+            return sf::Color(235, 10, 101);
+            break;
     }
     return sf::Color(0, 0, 0);
 }
@@ -233,6 +247,14 @@ void Engine::render()
                     break;
                 case acid:
                     elementColor = getElementColor(acid);
+                    dynamicColorShade(elementColor);
+                    break;
+                case gunpowder:
+                    elementColor = getElementColor(gunpowder);
+                    staticColorShade(elementColor, colorShade);
+                    break;
+                case slime:
+                    elementColor = getElementColor(slime);
                     dynamicColorShade(elementColor);
                     break;
             }
